@@ -1,20 +1,18 @@
-# GAPI
+# GAPI-JZON
 
-Google API client for Common Lisp.
+**This is (probably) NOT THE PROJECT YOU WANT.**
 
+Please go to https://github.com/Junker/gapi . This is a modified fork
+of Dmitry Kosenkov's Google API client for Common Lisp.
+
+This fork exists to:
+
+1. use COM.INUOE.JZON instead of Jonathan, which complicates compatibility, and to
+2. freely explore changes I might need.
+  
 ## Warning
 
 This software is still ALPHA quality. The APIs will be likely to change.
-
-## Installation
-
-This system can be installed from [UltraLisp](https://ultralisp.org/) like this:
-
-```common-lisp
-(ql-dist:install-dist "http://dist.ultralisp.org/"
-                      :prompt nil)
-(ql:quickload "gapi")
-```
 
 ## Usage
 
