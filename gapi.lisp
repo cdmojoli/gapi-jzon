@@ -38,14 +38,6 @@
 (defun parse-service-account-file (path)
   (jojo:parse (uiop:read-file-string path)))
 
-(defun read-pkcs8-private-key (pem)
-  (let* ((pkcs8-der (asn1:decode (base64:base64-string-to-usb8-array
-                                  (cdar (pem:parse (make-string-input-stream pem))))))
-         (pkcs1-der (asn1:decode (cdr (fourth (car pkcs8-der))))))
-    (trivia:match pkcs1-der
-      ((asn1:rsa-private-key :private-exponent d :modulus n)
-       (ironclad:make-private-key :rsa :d d :n n)))))
-
 (defun %generate-jwt (private-key client-email token-uri scopes expiry-length)
   (jose:encode :rs256 private-key `(("iss" . ,client-email)
                                     ("iat" . ,(get-unix-time))
@@ -64,7 +56,7 @@
   (let ((acc (parse-service-account-file path)))
     (make-instance 'client
                    :project-id (getf acc :|project_id|)
-                   :private-key (read-pkcs8-private-key (getf acc :|private_key|))
+                   :private-key (pem:read-pem (getf acc :|private_key|))
                    :client-email (getf acc :|client_email|)
                    :token-uri (getf acc :|token_uri|)
                    :scopes scopes)))
