@@ -1,4 +1,4 @@
-(defpackage gapi
+(defpackage gapi-jzon
   (:use #:cl #:alexandria)
   (:import-from #:local-time
                 #:timestamp-to-unix

@@ -1,4 +1,4 @@
-(in-package #:gapi)
+(in-package #:gapi-jzon)
 
 ;; source: https://github.com/ruricolist/serapeum/blob/master/time.lisp
 
