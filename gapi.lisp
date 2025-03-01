@@ -1,6 +1,7 @@
 (in-package #:gapi-jzon)
 
-(defparameter *jwt-token-expiry-length* 3600)
+(defparameter *jwt-token-expiry-length* 3600) ; seconds
+(defparameter *expiration-safety-margin* 120) ; seconds
 
 (define-condition gapi-error (error)
   ((code :initarg :code
@@ -109,7 +110,7 @@
   (declare (values boolean))
 
   (> (get-universal-time)
-     (client-access-token-expires-at client)))
+     (- (client-access-token-expires-at client) - *expiration-safety-margin*)))
 
 (defmethod client-authorized-p ((client client))
   (declare (values boolean))
