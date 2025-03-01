@@ -99,6 +99,7 @@
     (%generate-jwt private-key client-email token-uri scopes expiry-length)))
 
 (defmethod auth ((client client))
+  (log:d "Requesting authorization for client ~S" client)
   (trivia:match (%auth (client-token-uri client)
                        (generate-jwt client))
     ((jzon expires_in access_token)

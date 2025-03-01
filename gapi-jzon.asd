@@ -9,6 +9,7 @@
                "dexador"
                "ironclad"
                "jose"
+               "log4cl"
                "pem")
   :description "Google Cloud API Client (JZON version)"
   :homepage "https://github.com/Junker/gapi"
