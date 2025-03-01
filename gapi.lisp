@@ -76,12 +76,9 @@
 
 ;; PUBLIC
 
-(defun make-client-with-service-account (path &key scopes)
-  (declare (pathname path)
-           (list scopes)
-           (values client))
-
-  (trivia:match (parse-service-account-file path)
+(defgeneric make-client-with-service-account (source &key scopes)
+  (:method ((source hash-table) &key scopes)
+    (trivia:match source
     ((jzon project_id private_key client_email token_uri)
      (make-instance 'client
                     :project-id project_id
@@ -89,6 +86,9 @@
                     :client-email client_email
                     :token-uri token_uri
                     :scopes scopes))))
+  (:method ((source pathname) &key scopes)
+    (make-client-with-service-account (parse-service-account-file source)
+                                      :scopes scopes)))
 
 (defmethod generate-jwt ((client client)
                          &key (expiry-length *jwt-token-expiry-length*))
