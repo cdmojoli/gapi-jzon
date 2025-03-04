@@ -26,5 +26,6 @@
            #:generate-jwt
            #:make-client-with-service-account
            #:request
+           #:response
            #:&client
            #:&payload))

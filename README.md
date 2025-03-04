@@ -20,36 +20,34 @@ APIs will be likely to change.
 GAPI-JZON allows you to:
 
 ```common-lisp
-CL-USER> (use-package :gapi-jzon)
-;;=> T
+(use-package :gapi-jzon)
 
-CL-USER> (defun-gapi get-calendar-events (&client calendar-id start end)
-           (declare (string calendar-id start end)) ; regular declaration, optional.
-           "Return JZON of calendar events"         ; doc-string, optional
+(defun-gapi get-calendar-events
+  (:GET "https://www.googleapis.com/calendar/v3/calendars/~A/events?timeMin=~A&timeMax=~A&orderBy=startTime&singleEvents=true"
+        (&client calendario-id start end))) ; by default, we return the API's JZON parsed result
 
-           :GET                                     ; http method, required
-           "https://www.googleapis.com/calendar/v3/calendars/~A/events?timeMin=~A&timeMax=~A&orderBy=startTime&singleEvents=true")
-;;=> GET-CALENDAR-EVENTS
+(defun-gapi delete-calendar
+    (:DELETE "https://www.googleapis.com/calendar/v3/calendars/~A"
+     (&client calendar-id)))
 
-CL-USER> (defparameter *client* (gapi-jzon:make-client-with-service-account
+(defun-gapi list-calendars
+    (:GET "https://www.googleapis.com/calendar/v3/users/me/calendarList"
+     (&client))
+  (princ (length response)) ; RESPONSE is lexically bound in the body
+  response) ; when there's a body, its evaluation is the function's value.
+
+(defparameter *client* (gapi-jzon:make-client-with-service-account
                                  #P"/home/myuser/service-account-key-file"
                                  :scopes '("https://www.googleapis.com/auth/calendar")))
-;;=> *CLIENT*
 
-CL-USER> (defparameter *calendar-id* "c_eda0999*********************************81ff@group.calendar.google.com")
-;;=> *CALENDAR-ID*
+(defparameter *calendar-id* "c_eda0999*********************************81ff@group.calendar.google.com")
 
-CL-USER> (get-calendar-events *client* *calendar-id* 
-                              "2025-01-01T00:00:00-04:00" "2025-02-01T00:00:00-04:00")
-;;=> #<HASH-TABLE :TEST EQUAL :COUNT 9 {1003EF87E3}>
 
-CL-USER> (match *
+(match (get-calendar-events *client* *calendar-id* 
+                            "2025-01-01T00:00:00-04:00" "2025-02-01T00:00:00-04:00")
            ((jzon items
                   updated)
             (format t "~D items retrieved, last updated ~S~%" (length items) updated)))
-;;-> 230 items retrieved, last updated "2025-02-27T07:24:56.346Z"
-;;=> NIL
-
 ```
 
 DEFUN-GAPI introduces two lambda list keywords: &CLIENT and &PAYLOAD.

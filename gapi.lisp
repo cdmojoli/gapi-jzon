@@ -111,7 +111,7 @@
   (declare (values boolean))
 
   (> (get-universal-time)
-     (- (client-access-token-expires-at client) - *expiration-safety-margin*)))
+     (- (client-access-token-expires-at client) *expiration-safety-margin*)))
 
 (defmethod client-authorized-p ((client client))
   (declare (values boolean))
@@ -122,9 +122,9 @@
   (declare (string url))
 
   (assert (client-access-token client)
-          nil "Client is not authorized, use (gapi:auth client)")
+          nil "Client is not authorized, use (gapi-jzon:auth client)")
   (handler-case
-      (com.inuoe.jzon:parse
+      (multiple-value-bind (body status response-headers uri)
        (dex:request url
                     :method method
                     :headers `(("Content-Type" . "application/json")
@@ -132,7 +132,9 @@
                                                            (client-access-token client))))
                     :content (etypecase jzon-payload
                                ((or string vector null) jzon-payload)
-                               ((or hash-table list) (com.inuoe.jzon:stringify jzon-payload)))))
+                                  ((or hash-table list) (com.inuoe.jzon:stringify jzon-payload))))
+        (values (if (string= body "") nil (com.inuoe.jzon:parse body))
+                status response-headers uri))
     (dex:http-request-failed (err)
       (if (not (equal (gethash "content-type" (dex:response-headers err))
                       "application/json; charset=UTF-8"))
